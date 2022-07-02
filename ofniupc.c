@@ -1,8 +1,11 @@
+#include "linux/binfmts.h"
 #include "linux/printk.h"
+#include "linux/sched.h"
 #include "linux/stddef.h"
 
 #include <linux/kernel.h>
 #include <linux/module.h>
+#include <linux/proc_fs.h>
 #include <linux/processor.h>
 #include <linux/seq_file.h>
 
@@ -50,7 +53,9 @@ struct seq_operations *get_cpuinfo_op(void)
 
 static int custom_show_function(struct seq_file *m, void *v)
 {
-    pr_warn(MOD "hooked call, TODO");
+    struct linux_binfmt *binfmt = current->mm->binfmt;
+
+    pr_warn(MOD "hooked call, from PID: %d, module: %s", current->pid, binfmt->module->name);
     seq_printf(m, "processor   : %lld\n", m->index);
     seq_printf(m, "vendor_id   : Moody\n");
     // return original_show_fn(m, v);
